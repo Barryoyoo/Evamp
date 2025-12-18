@@ -1,53 +1,139 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { Toaster } from './components/ui/sonner';
+import LoginPage from './pages/LoginPage';
+import CoverPage from './pages/CoverPage';
+import AboutPage from './pages/AboutPage';
+import GalleryPage from './pages/GalleryPage';
+import AchievementsPage from './pages/AchievementsPage';
+import ToDosPage from './pages/ToDosPage';
+import TributePage from './pages/TributePage';
+import Navigation from './components/Navigation';
+import '@/App.css';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useTheme();
+  return isAuthenticated ? children : <Navigate to="/" />;
+};
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  const { isAuthenticated } = useTheme();
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
+    <>
+      {isAuthenticated && location.pathname !== '/' && <Navigation />}
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<LoginPage />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <CoverPage />
+                </motion.div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <ProtectedRoute>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <AboutPage />
+                </motion.div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gallery"
+            element={
+              <ProtectedRoute>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <GalleryPage />
+                </motion.div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/achievements"
+            element={
+              <ProtectedRoute>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <AchievementsPage />
+                </motion.div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/todos"
+            element={
+              <ProtectedRoute>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ToDosPage />
+                </motion.div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tribute"
+            element={
+              <ProtectedRoute>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <TributePage />
+                </motion.div>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AnimatePresence>
+    </>
   );
 };
 
 function App() {
   return (
-    <div className="App">
+    <ThemeProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <div className="App">
+          <AnimatedRoutes />
+          <Toaster position="top-right" />
+        </div>
       </BrowserRouter>
-    </div>
+    </ThemeProvider>
   );
 }
 
