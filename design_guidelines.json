@@ -1,0 +1,139 @@
+{
+  "project_name": "Vampire & Echo - The Eternal Bond",
+  "design_philosophy": {
+    "core_concept": "Dual Reality",
+    "themes": {
+      "vampire": {
+        "name": "Vampire Mode",
+        "emotional_tone": "Cinematic, Intense, Premium, Gaming HUD",
+        "visual_style": "Cyberpunk Noir meets High-End Tech",
+        "base_color": "#050505",
+        "primary_accent": "#00f0ff",
+        "secondary_accent": "#ffd700",
+        "surface_style": "Glassmorphism (Dark), Sharp Edges, Glowing Borders"
+      },
+      "echo": {
+        "name": "Echo Mode",
+        "emotional_tone": "Soft, Romantic, Dreamy, Ethereal",
+        "visual_style": "Pastel Sunset, Cloudcore, Soft Glass",
+        "base_color": "#fff0f5",
+        "primary_accent": "#ffb7b2",
+        "secondary_accent": "#fdfd96",
+        "surface_style": "Glassmorphism (Light), Rounded Corners, Soft Shadows"
+      }
+    }
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Rajdhani, sans-serif",
+      "weights": ["600", "700"],
+      "usage": "Main titles, Section headers",
+      "vampire_style": "tracking-tighter uppercase text-cyan-400 drop-shadow-[0_0_10px_rgba(0,240,255,0.5)]",
+      "echo_style": "tracking-wide capitalize text-pink-500 drop-shadow-sm"
+    },
+    "body": {
+      "font_family": "Poppins, sans-serif",
+      "weights": ["300", "400", "500"],
+      "usage": "Paragraphs, UI elements"
+    },
+    "signature": {
+      "font_family": "Bangers, cursive",
+      "usage": "Comic bubbles, 'Created by Barry' signature",
+      "style": "text-yellow-400 rotate-[-2deg] drop-shadow-md"
+    }
+  },
+  "colors": {
+    "palette": {
+      "vampire": {
+        "bg": "bg-zinc-950",
+        "text": "text-zinc-100",
+        "primary": "bg-cyan-500",
+        "border": "border-cyan-500/50",
+        "glow": "shadow-[0_0_20px_rgba(0,240,255,0.3)]"
+      },
+      "echo": {
+        "bg": "bg-gradient-to-br from-pink-50 to-yellow-50",
+        "text": "text-slate-800",
+        "primary": "bg-pink-400",
+        "border": "border-white/60",
+        "glow": "shadow-[0_8px_30px_rgba(255,183,178,0.4)]"
+      }
+    },
+    "gradients": {
+      "vampire_hero": "bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-[#0a0a0a] to-black",
+      "echo_hero": "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-pink-200 via-purple-100 to-yellow-50"
+    }
+  },
+  "layout_strategies": {
+    "cover_page": {
+      "type": "Cinematic Fullscreen",
+      "structure": "Z-layered slideshow. Text overlay centered with 'glitch' effect for Vampire, 'fade' for Echo.",
+      "interaction": "Scroll to enter (Parallax effect)"
+    },
+    "about_page": {
+      "type": "Comic Book Grid",
+      "structure": "CSS Grid 'Tetris' layout. Irregular panel sizes. Thick borders for Vampire (Comic Noir), Soft white borders for Echo (Shojo Manga).",
+      "features": "Speech bubbles appearing on scroll."
+    },
+    "gallery_page": {
+      "type": "Masonry / Bento",
+      "structure": "Dynamic columns. Images zoom on hover.",
+      "vampire_twist": "Holographic frame overlay on images.",
+      "echo_twist": "Polaroid style with handwritten captions."
+    },
+    "achievements_page": {
+      "type": "Gaming Skill Tree",
+      "structure": "Vertical timeline with connecting lines. Nodes glow when unlocked.",
+      "animation": "Confetti explosion on unlock."
+    },
+    "tribute_page": {
+      "type": "Memorial Slideshow",
+      "structure": "Slow Ken Burns effect. Darker, respectful overlay even in Echo mode.",
+      "audio": "Optional background music toggle."
+    }
+  },
+  "components": {
+    "buttons": {
+      "vampire": "rounded-sm border border-cyan-500 bg-black/50 text-cyan-400 hover:bg-cyan-500 hover:text-black transition-all duration-300 uppercase tracking-widest shadow-[0_0_10px_rgba(0,240,255,0.2)]",
+      "echo": "rounded-full bg-gradient-to-r from-pink-400 to-yellow-400 text-white hover:scale-105 transition-transform duration-300 shadow-lg font-medium tracking-wide"
+    },
+    "cards": {
+      "vampire": "bg-black/40 backdrop-blur-md border border-white/10 hover:border-cyan-500/50 transition-colors",
+      "echo": "bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm hover:shadow-md transition-shadow"
+    },
+    "inputs": {
+      "vampire": "bg-black/50 border-b-2 border-zinc-700 focus:border-cyan-500 outline-none text-white placeholder:text-zinc-500",
+      "echo": "bg-white/80 rounded-xl border border-pink-100 focus:ring-2 focus:ring-pink-200 outline-none text-slate-700"
+    }
+  },
+  "motion_guidelines": {
+    "library": "framer-motion",
+    "transitions": {
+      "page": "AnimatePresence mode='wait'. Variants: { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -20 } }",
+      "hover": "scale: 1.02, transition: { type: 'spring', stiffness: 400, damping: 10 }"
+    },
+    "special_effects": {
+      "vampire_bg": "tsparticles (embers/ash effect)",
+      "echo_bg": "tsparticles (floating petals or soft clouds)",
+      "glitch": "CSS clip-path animation for Vampire titles"
+    }
+  },
+  "assets": {
+    "images": {
+      "vampire_bg": "https://images.pexels.com/photos/3389817/pexels-photo-3389817.jpeg",
+      "echo_bg": "https://images.pexels.com/photos/1287142/pexels-photo-1287142.jpeg",
+      "couple_placeholder": "https://images.pexels.com/photos/35236760/pexels-photo-35236760.jpeg",
+      "achievement_icon": "https://images.pexels.com/photos/6532364/pexels-photo-6532364.jpeg"
+    },
+    "icons": "Lucide React (default). Use 'Zap', 'Moon', 'Heart', 'Cloud' icons."
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'framer-motion', 'tsparticles', '@tsparticles/react', '@tsparticles/slim' immediately.",
+    "2. THEME CONTEXT: Create a 'ThemeContext' that wraps the app. It must persist to localStorage. Toggle class 'dark' on the HTML element for Tailwind dark mode support.",
+    "3. FONT SETUP: Import 'Rajdhani', 'Poppins', and 'Bangers' from Google Fonts in index.css.",
+    "4. ROUTING: Use React Router. Wrap routes in <AnimatePresence> for page transitions.",
+    "5. TRIBUTE PAGE: This is sensitive. Ensure the design is respectful. Use the 'couple_placeholder' but with a sepia or B&W filter.",
+    "6. COMIC LAYOUT: For the About page, use CSS Grid. Create a 'ComicPanel' component that accepts a 'variant' prop (vampire/echo) to switch border styles.",
+    "7. DATA-TESTID: Add data-testid to the Theme Toggle button ('theme-toggle'), Login button ('login-btn'), and Gallery Upload button ('upload-btn')."
+  ]
+}
