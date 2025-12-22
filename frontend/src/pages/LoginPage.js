@@ -36,7 +36,7 @@ const LoginPage = () => {
       }
     } catch (err) {
       setError('Connection error');
-    }
+    } 
   };
 
   return (
@@ -121,3 +121,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
