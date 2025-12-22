@@ -4,10 +4,12 @@ import { useTheme } from '../context/ThemeContext';
 import { ChevronDown } from 'lucide-react';
 
 const placeholderImages = [
-  'https://images.pexels.com/photos/3389817/pexels-photo-3389817.jpeg?auto=compress&cs=tinysrgb&w=600',
-  'https://images.pexels.com/photos/1287142/pexels-photo-1287142.jpeg?auto=compress&cs=tinysrgb&w=600',
-  'https://images.pexels.com/photos/35236760/pexels-photo-35236760.jpeg?auto=compress&cs=tinysrgb&w=600',
-  'https://images.pexels.com/photos/6532364/pexels-photo-6532364.jpeg?auto=compress&cs=tinysrgb&w=600'
+  'https://ik.imagekit.io/1bpypwezv/IMG20251211224724.jpg',
+  'https://ik.imagekit.io/1bpypwezv/IMG-20250906-WA0001.jpg',
+  'https://ik.imagekit.io/1bpypwezv/IMG-20250904-WA0030.jpg',
+  'https://ik.imagekit.io/1bpypwezv/IMG-20251216-WA0092.jpg',
+  'https://ik.imagekit.io/1bpypwezv/IMG-20251216-WA0076.jpg',
+  'https://ik.imagekit.io/1bpypwezv/IMG-20251216-WA0095.jpg'
 ];
 
 const CoverPage = () => {
