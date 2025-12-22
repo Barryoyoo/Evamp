@@ -17,6 +17,8 @@ const LoginPage = () => {
 
     console.log("Backend URL:", BACKEND_URL);
     console.log("Sending payload:", { password });
+    console.log("Sending payload:", JSON.stringify({ password }));
+
 
     try {
       const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
