@@ -5,11 +5,9 @@ import { ChevronDown } from 'lucide-react';
 
 const placeholderImages = [
   'https://ik.imagekit.io/1bpypwezv/IMG20251211224724.jpg',
-  'https://ik.imagekit.io/1bpypwezv/IMG-20250906-WA0001.jpg',
-  'https://ik.imagekit.io/1bpypwezv/IMG-20250904-WA0030.jpg',
   'https://ik.imagekit.io/1bpypwezv/IMG-20251216-WA0092.jpg',
-  'https://ik.imagekit.io/1bpypwezv/IMG-20251216-WA0076.jpg',
-  'https://ik.imagekit.io/1bpypwezv/IMG-20251216-WA0095.jpg'
+  'https://ik.imagekit.io/1bpypwezv/IMG-20250906-WA0001.jpg',
+  'https://ik.imagekit.io/1bpypwezv/IMG20251219191111%20(1).jpg'
 ];
 
 const CoverPage = () => {
