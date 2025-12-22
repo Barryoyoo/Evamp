@@ -14,6 +14,10 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    console.log("Backend URL:", BACKEND_URL);
+    console.log("Sending payload:", { password });
+
     try {
       const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: 'POST',
