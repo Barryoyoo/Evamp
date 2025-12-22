@@ -23,7 +23,7 @@ db = client[os.environ['DB_NAME']]
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
-SECRET_PASSWORD = os.getenv("VAULT_PASSWORD" "vampire2024")
+SECRET_PASSWORD = os.getenv("VAULT_PASSWORD" "12345678")
 ACCESS_TOKEN = "memory_vault_session_token"
 
 
