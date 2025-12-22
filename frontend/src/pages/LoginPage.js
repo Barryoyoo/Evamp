@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_URL = /*process.env.NEXT_PUBLIC_BACKEND_URL*/ "https://powerful-tenderness-production-d472.up.railway.app";
 
 const LoginPage = () => {
   const [password, setPassword] = useState('');
