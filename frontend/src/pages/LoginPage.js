@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 
-const BACKEND_URL = process.env.REACT_PUBLIC_BACKEND_URL /*"https://powerful-tenderness-production-d472.up.railway.app"*/;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL /*"https://powerful-tenderness-production-d472.up.railway.app"*/;
 
 const LoginPage = () => {
   const [password, setPassword] = useState('');
@@ -24,7 +24,7 @@ const LoginPage = () => {
       const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: "12345678" })
+        body: JSON.stringify({ password })
       });
       
       if (response.ok) {
