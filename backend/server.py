@@ -11,6 +11,9 @@ import uuid
 from datetime import datetime, timezone
 import base64
 import secrets
+import certifi
+
+client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
 
 
 ROOT_DIR = Path(__file__).parent
@@ -128,6 +131,7 @@ async def get_gallery():
         if isinstance(img['timestamp'], str):
             img['timestamp'] = datetime.fromisoformat(img['timestamp'])
     return images
+    
 
 
 @api_router.post("/gallery", response_model=GalleryImage)
