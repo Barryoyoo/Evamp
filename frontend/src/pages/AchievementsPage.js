@@ -25,7 +25,7 @@ const AchievementsPage = () => {
 
   const fetchAchievements = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/achievements`);
+      const response = await fetch(`${BACKEND_URL}/achievements`);
       const data = await response.json();
       setAchievements(data);
     } catch (err) {
@@ -47,7 +47,7 @@ const AchievementsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${BACKEND_URL}/api/achievements`, {
+      const response = await fetch(`${BACKEND_URL}/achievements`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAchievement)
@@ -72,7 +72,7 @@ const AchievementsPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/achievements/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/achievements/${id}`, {
         method: 'DELETE'
       });
       

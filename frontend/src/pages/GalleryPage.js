@@ -18,7 +18,7 @@ const GalleryPage = () => {
 
   const fetchImages = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/gallery`);
+      const response = await fetch(`${BACKEND_URL}/gallery`);
       const data = await response.json();
       setImages(data);
     } catch (err) {
@@ -35,7 +35,7 @@ const GalleryPage = () => {
     const reader = new FileReader();
     reader.onloadend = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/api/gallery`, {
+        const response = await fetch(`${BACKEND_URL}/gallery`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -57,7 +57,7 @@ const GalleryPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/gallery/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/gallery/${id}`, {
         method: 'DELETE'
       });
       
