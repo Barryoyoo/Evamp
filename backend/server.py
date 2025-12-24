@@ -13,15 +13,15 @@ import base64
 import secrets
 import certifi
 
-client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
-
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db_name = os.environ.get("DB_NAME", "memory_vault")
+
+client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
+db = client[db_name]
 
 app = FastAPI()
 #api_router = APIRouter(prefix="/api")
