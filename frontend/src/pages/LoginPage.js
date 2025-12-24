@@ -12,7 +12,23 @@ const LoginPage = () => {
   const { theme, toggleTheme, login } = useTheme();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+
+
+
+  const FRONTEND_PASSWORD = "11223344";
+
+const handleLogin = (e) => {
+  e.preventDefault();
+  if (password === FRONTEND_PASSWORD) {
+    localStorage.setItem("vault_token", "memory_vault_session_token");
+    navigate("/home");
+  } else {
+    setError("Invalid password");
+  }
+};
+
+
+ /* const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
@@ -36,7 +52,7 @@ const LoginPage = () => {
     } catch (err) {
       setError('Connection error');
     } 
-  };
+  };*/
 
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 ${
