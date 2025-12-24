@@ -21,7 +21,8 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 app = FastAPI()
-api_router = APIRouter(prefix="/api")
+#api_router = APIRouter(prefix="/api")
+api_router = APIRouter()
 
 SECRET_PASSWORD = os.environ["VAULT_PASSWORD"]
 ACCESS_TOKEN = "memory_vault_session_token"
