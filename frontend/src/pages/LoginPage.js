@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL /*"https://powerful-tenderness-production-d472.up.railway.app"*/;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const LoginPage = () => {
   const [password, setPassword] = useState('');
@@ -12,25 +12,8 @@ const LoginPage = () => {
   const { theme, toggleTheme, login } = useTheme();
   const navigate = useNavigate();
 
-
-
-
-  const FRONTEND_PASSWORD = "11223344";
-
-const handleLogin = (e) => {
-  e.preventDefault();
-  if (password === FRONTEND_PASSWORD) {
-    localStorage.setItem("vault_token", "memory_vault_session_token");
-    navigate("/home");
-  } else {
-    setError("Invalid password");
-  }
-};
-
-
- /* const handleLogin = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: 'POST',
@@ -40,10 +23,6 @@ const handleLogin = (e) => {
       
       if (response.ok) {
         const data = await response.json();
-
-        localStorage.setItem("vault_token", data.token);
-        localStorage.setItem("vault_theme", data.theme);
-
         login(data.token, data.theme);
         navigate('/home');
       } else {
@@ -51,8 +30,8 @@ const handleLogin = (e) => {
       }
     } catch (err) {
       setError('Connection error');
-    } 
-  };*/
+    }
+  };
 
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 ${
@@ -136,4 +115,3 @@ const handleLogin = (e) => {
 };
 
 export default LoginPage;
-

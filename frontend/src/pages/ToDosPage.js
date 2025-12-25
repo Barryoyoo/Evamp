@@ -18,7 +18,7 @@ const ToDosPage = () => {
 
   const fetchTodos = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/todos`);
+      const response = await fetch(`${BACKEND_URL}/api/todos`);
       const data = await response.json();
       setTodos(data);
     } catch (err) {
@@ -31,7 +31,7 @@ const ToDosPage = () => {
     if (!newTask.trim()) return;
 
     try {
-      const response = await fetch(`${BACKEND_URL}/todos`, {
+      const response = await fetch(`${BACKEND_URL}/api/todos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ task: newTask })
@@ -49,7 +49,7 @@ const ToDosPage = () => {
 
   const handleToggle = async (id, completed) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/todos/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/todos/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completed: !completed })
@@ -73,7 +73,7 @@ const ToDosPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/todos/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/todos/${id}`, {
         method: 'DELETE'
       });
       

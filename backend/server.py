@@ -11,23 +11,19 @@ import uuid
 from datetime import datetime, timezone
 import base64
 import secrets
-import certifi
 
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 mongo_url = os.environ['MONGO_URL']
-db_name = os.environ.get("DB_NAME", "memory_vault")
-
-client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
-db = client[db_name]
+client = AsyncIOMotorClient(mongo_url)
+db = client[os.environ['DB_NAME']]
 
 app = FastAPI()
-#api_router = APIRouter(prefix="/api")
-api_router = APIRouter()
+api_router = APIRouter(prefix="/api")
 
-SECRET_PASSWORD = os.environ["VAULT_PASSWORD"]
+SECRET_PASSWORD = "vampire2024"
 ACCESS_TOKEN = "memory_vault_session_token"
 
 
@@ -131,7 +127,6 @@ async def get_gallery():
         if isinstance(img['timestamp'], str):
             img['timestamp'] = datetime.fromisoformat(img['timestamp'])
     return images
-    
 
 
 @api_router.post("/gallery", response_model=GalleryImage)
@@ -260,12 +255,12 @@ async def update_theme(theme_update: ThemeUpdate):
     return {"theme": theme_update.theme}
 
 
-app.include_router(api_router)
+app.include_router(api_router)  
 
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=os.environ.get("https://evamp.vercel.app", '*').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
