@@ -152,7 +152,7 @@ const Navigation = () => {
                     : 'bg-pink-100 text-pink-600 hover:bg-pink-200'
                 }`}
               >
-                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                {theme === 'dark' ? <Heart size={20} /> : <User size={20} />}
                 <span className="font-medium">Toggle Theme</span>
               </button>
 
