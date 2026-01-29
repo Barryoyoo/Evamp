@@ -77,7 +77,7 @@ const Navigation = () => {
                     : 'bg-pink-100 text-pink-600 hover:bg-pink-200'
                 }`}
               >
-                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                {theme === 'dark' ? <Heart size={18} /> : <User size={18} />}
               </button>
 
               <button
