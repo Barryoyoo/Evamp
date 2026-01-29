@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
-import { Home, Users, Image, Trophy, ListTodo, Heart, Menu, X, Moon, Sun, LogOut } from 'lucide-react';
+import { Home, Users, Image, Trophy, ListTodo, Heart, Menu, X, User, LogOut } from 'lucide-react';
 
 const Navigation = () => {
   const { theme, toggleTheme, logout } = useTheme();
