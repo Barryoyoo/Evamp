@@ -48,7 +48,7 @@ const LoginPage = () => {
             : 'bg-pink-200/50 text-pink-600 hover:bg-pink-300/50 border border-pink-300'
         }`}
       >
-        {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+        {theme === 'dark' ? <Heart size={24} /> : <User size={24} />}
       </button>
 
       <motion.div
