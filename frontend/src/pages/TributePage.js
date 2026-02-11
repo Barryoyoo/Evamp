@@ -30,7 +30,7 @@ const TributePage = () => {
 
   const fetchImages = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/tribute`);
+      const response = await fetch(`${BACKEND_URL}/api/tribute`);
       const data = await response.json();
       setImages(data);
     } catch (err) {
@@ -45,7 +45,7 @@ const TributePage = () => {
     const reader = new FileReader();
     reader.onloadend = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/tribute`, {
+        const response = await fetch(`${BACKEND_URL}/api/tribute`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -68,7 +68,7 @@ const TributePage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/tribute/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/tribute/${id}`, {
         method: 'DELETE'
       });
       
