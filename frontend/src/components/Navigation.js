@@ -2,11 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
-<<<<<<< HEAD
-import { Home, Users, Image, Trophy, ListTodo, Heart, Menu, X, User, LogOut } from 'lucide-react';
-=======
 import { Home, Users, Image, Trophy, ListTodo, Heart, Menu, X, Moon, Sun, LogOut } from 'lucide-react';
->>>>>>> 9a5d5d8 (first commit)
 
 const Navigation = () => {
   const { theme, toggleTheme, logout } = useTheme();
@@ -81,11 +77,7 @@ const Navigation = () => {
                     : 'bg-pink-100 text-pink-600 hover:bg-pink-200'
                 }`}
               >
-<<<<<<< HEAD
-                {theme === 'dark' ? <Heart size={18} /> : <User size={18} />}
-=======
                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
->>>>>>> 9a5d5d8 (first commit)
               </button>
 
               <button
@@ -160,11 +152,7 @@ const Navigation = () => {
                     : 'bg-pink-100 text-pink-600 hover:bg-pink-200'
                 }`}
               >
-<<<<<<< HEAD
-                {theme === 'dark' ? <Heart size={20} /> : <User size={20} />}
-=======
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
->>>>>>> 9a5d5d8 (first commit)
                 <span className="font-medium">Toggle Theme</span>
               </button>
 
