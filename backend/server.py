@@ -1,24 +1,26 @@
-from fastapi import FastAPI, APIRouter, HTTPException, File, UploadFile
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
+from sqlalchemy import create_engine, Column, String, Boolean, DateTime, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
-import base64
-import secrets
 
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://user:password@localhost:5432/myMemoriesDB')
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
@@ -27,6 +29,66 @@ SECRET_PASSWORD = "vampire2024"
 ACCESS_TOKEN = "memory_vault_session_token"
 
 
+# Database Models
+class GalleryImageDB(Base):
+    __tablename__ = "gallery"
+    
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    image_data = Column(Text, nullable=False)
+    caption = Column(String, default="")
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class AchievementDB(Base):
+    __tablename__ = "achievements"
+    
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=False)
+    image_data = Column(Text, nullable=True)
+    date = Column(String, nullable=False)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class ToDoDB(Base):
+    __tablename__ = "todos"
+    
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    task = Column(String, nullable=False)
+    completed = Column(Boolean, default=False)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class TributeImageDB(Base):
+    __tablename__ = "tribute"
+    
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    image_data = Column(Text, nullable=False)
+    caption = Column(String, default="")
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class SettingsDB(Base):
+    __tablename__ = "settings"
+    
+    key = Column(String, primary_key=True)
+    value = Column(String, nullable=False)
+
+
+# Create tables
+Base.metadata.create_all(bind=engine)
+
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+# Pydantic Models
 class LoginRequest(BaseModel):
     password: str
 
@@ -38,12 +100,10 @@ class LoginResponse(BaseModel):
 
 
 class GalleryImage(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str
     image_data: str
     caption: Optional[str] = ""
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime
 
 
 class GalleryImageCreate(BaseModel):
@@ -52,14 +112,12 @@ class GalleryImageCreate(BaseModel):
 
 
 class Achievement(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str
     title: str
     description: str
     image_data: Optional[str] = None
     date: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime
 
 
 class AchievementCreate(BaseModel):
@@ -70,12 +128,10 @@ class AchievementCreate(BaseModel):
 
 
 class ToDo(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str
     task: str
     completed: bool = False
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime
 
 
 class ToDoCreate(BaseModel):
@@ -87,12 +143,10 @@ class ToDoUpdate(BaseModel):
 
 
 class TributeImage(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str
     image_data: str
     caption: Optional[str] = ""
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime
 
 
 class TributeImageCreate(BaseModel):
@@ -104,154 +158,220 @@ class ThemeUpdate(BaseModel):
     theme: str
 
 
+# Routes
 @api_router.post("/auth/login", response_model=LoginResponse)
-async def login(request: LoginRequest):
+def login(request: LoginRequest, db: Session = Depends(get_db)):
     if request.password == SECRET_PASSWORD:
-        settings = await db.settings.find_one({"key": "theme"}, {"_id": 0})
-        theme = settings.get("value", "dark") if settings else "dark"
+        settings = db.query(SettingsDB).filter(SettingsDB.key == "theme").first()
+        theme = settings.value if settings else "dark"
         return LoginResponse(success=True, token=ACCESS_TOKEN, theme=theme)
     raise HTTPException(status_code=401, detail="Invalid password")
 
 
 @api_router.get("/auth/verify")
-async def verify_token(token: str):
+def verify_token(token: str):
     if token == ACCESS_TOKEN:
         return {"valid": True}
     raise HTTPException(status_code=401, detail="Invalid token")
 
 
 @api_router.get("/gallery", response_model=List[GalleryImage])
-async def get_gallery():
-    images = await db.gallery.find({}, {"_id": 0}).sort("timestamp", -1).to_list(1000)
-    for img in images:
-        if isinstance(img['timestamp'], str):
-            img['timestamp'] = datetime.fromisoformat(img['timestamp'])
-    return images
+def get_gallery(db: Session = Depends(get_db)):
+    images = db.query(GalleryImageDB).order_by(GalleryImageDB.timestamp.desc()).all()
+    return [GalleryImage(
+        id=img.id,
+        image_data=img.image_data,
+        caption=img.caption,
+        timestamp=img.timestamp
+    ) for img in images]
 
 
 @api_router.post("/gallery", response_model=GalleryImage)
-async def create_gallery_image(image: GalleryImageCreate):
-    gallery_obj = GalleryImage(**image.model_dump())
-    doc = gallery_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    await db.gallery.insert_one(doc)
-    return gallery_obj
+def create_gallery_image(image: GalleryImageCreate, db: Session = Depends(get_db)):
+    db_image = GalleryImageDB(
+        id=str(uuid.uuid4()),
+        image_data=image.image_data,
+        caption=image.caption,
+        timestamp=datetime.now(timezone.utc)
+    )
+    db.add(db_image)
+    db.commit()
+    db.refresh(db_image)
+    return GalleryImage(
+        id=db_image.id,
+        image_data=db_image.image_data,
+        caption=db_image.caption,
+        timestamp=db_image.timestamp
+    )
 
 
 @api_router.delete("/gallery/{image_id}")
-async def delete_gallery_image(image_id: str):
-    result = await db.gallery.delete_one({"id": image_id})
-    if result.deleted_count == 0:
+def delete_gallery_image(image_id: str, db: Session = Depends(get_db)):
+    image = db.query(GalleryImageDB).filter(GalleryImageDB.id == image_id).first()
+    if not image:
         raise HTTPException(status_code=404, detail="Image not found")
+    db.delete(image)
+    db.commit()
     return {"success": True}
 
 
 @api_router.get("/achievements", response_model=List[Achievement])
-async def get_achievements():
-    achievements = await db.achievements.find({}, {"_id": 0}).sort("timestamp", -1).to_list(1000)
-    for achievement in achievements:
-        if isinstance(achievement['timestamp'], str):
-            achievement['timestamp'] = datetime.fromisoformat(achievement['timestamp'])
-    return achievements
+def get_achievements(db: Session = Depends(get_db)):
+    achievements = db.query(AchievementDB).order_by(AchievementDB.timestamp.desc()).all()
+    return [Achievement(
+        id=a.id,
+        title=a.title,
+        description=a.description,
+        image_data=a.image_data,
+        date=a.date,
+        timestamp=a.timestamp
+    ) for a in achievements]
 
 
 @api_router.post("/achievements", response_model=Achievement)
-async def create_achievement(achievement: AchievementCreate):
-    achievement_obj = Achievement(**achievement.model_dump())
-    doc = achievement_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    await db.achievements.insert_one(doc)
-    return achievement_obj
+def create_achievement(achievement: AchievementCreate, db: Session = Depends(get_db)):
+    db_achievement = AchievementDB(
+        id=str(uuid.uuid4()),
+        title=achievement.title,
+        description=achievement.description,
+        image_data=achievement.image_data,
+        date=achievement.date,
+        timestamp=datetime.now(timezone.utc)
+    )
+    db.add(db_achievement)
+    db.commit()
+    db.refresh(db_achievement)
+    return Achievement(
+        id=db_achievement.id,
+        title=db_achievement.title,
+        description=db_achievement.description,
+        image_data=db_achievement.image_data,
+        date=db_achievement.date,
+        timestamp=db_achievement.timestamp
+    )
 
 
 @api_router.delete("/achievements/{achievement_id}")
-async def delete_achievement(achievement_id: str):
-    result = await db.achievements.delete_one({"id": achievement_id})
-    if result.deleted_count == 0:
+def delete_achievement(achievement_id: str, db: Session = Depends(get_db)):
+    achievement = db.query(AchievementDB).filter(AchievementDB.id == achievement_id).first()
+    if not achievement:
         raise HTTPException(status_code=404, detail="Achievement not found")
+    db.delete(achievement)
+    db.commit()
     return {"success": True}
 
 
 @api_router.get("/todos", response_model=List[ToDo])
-async def get_todos():
-    todos = await db.todos.find({}, {"_id": 0}).sort("timestamp", -1).to_list(1000)
-    for todo in todos:
-        if isinstance(todo['timestamp'], str):
-            todo['timestamp'] = datetime.fromisoformat(todo['timestamp'])
-    return todos
+def get_todos(db: Session = Depends(get_db)):
+    todos = db.query(ToDoDB).order_by(ToDoDB.timestamp.desc()).all()
+    return [ToDo(
+        id=t.id,
+        task=t.task,
+        completed=t.completed,
+        timestamp=t.timestamp
+    ) for t in todos]
 
 
 @api_router.post("/todos", response_model=ToDo)
-async def create_todo(todo: ToDoCreate):
-    todo_obj = ToDo(**todo.model_dump())
-    doc = todo_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    await db.todos.insert_one(doc)
-    return todo_obj
+def create_todo(todo: ToDoCreate, db: Session = Depends(get_db)):
+    db_todo = ToDoDB(
+        id=str(uuid.uuid4()),
+        task=todo.task,
+        completed=False,
+        timestamp=datetime.now(timezone.utc)
+    )
+    db.add(db_todo)
+    db.commit()
+    db.refresh(db_todo)
+    return ToDo(
+        id=db_todo.id,
+        task=db_todo.task,
+        completed=db_todo.completed,
+        timestamp=db_todo.timestamp
+    )
 
 
 @api_router.patch("/todos/{todo_id}", response_model=ToDo)
-async def update_todo(todo_id: str, update: ToDoUpdate):
-    result = await db.todos.find_one_and_update(
-        {"id": todo_id},
-        {"$set": {"completed": update.completed}},
-        return_document=True
-    )
-    if not result:
+def update_todo(todo_id: str, update: ToDoUpdate, db: Session = Depends(get_db)):
+    todo = db.query(ToDoDB).filter(ToDoDB.id == todo_id).first()
+    if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
-    result.pop('_id', None)
-    if isinstance(result['timestamp'], str):
-        result['timestamp'] = datetime.fromisoformat(result['timestamp'])
-    return ToDo(**result)
+    todo.completed = update.completed
+    db.commit()
+    db.refresh(todo)
+    return ToDo(
+        id=todo.id,
+        task=todo.task,
+        completed=todo.completed,
+        timestamp=todo.timestamp
+    )
 
 
 @api_router.delete("/todos/{todo_id}")
-async def delete_todo(todo_id: str):
-    result = await db.todos.delete_one({"id": todo_id})
-    if result.deleted_count == 0:
+def delete_todo(todo_id: str, db: Session = Depends(get_db)):
+    todo = db.query(ToDoDB).filter(ToDoDB.id == todo_id).first()
+    if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
+    db.delete(todo)
+    db.commit()
     return {"success": True}
 
 
 @api_router.get("/tribute", response_model=List[TributeImage])
-async def get_tribute_images():
-    images = await db.tribute.find({}, {"_id": 0}).sort("timestamp", -1).to_list(1000)
-    for img in images:
-        if isinstance(img['timestamp'], str):
-            img['timestamp'] = datetime.fromisoformat(img['timestamp'])
-    return images
+def get_tribute_images(db: Session = Depends(get_db)):
+    images = db.query(TributeImageDB).order_by(TributeImageDB.timestamp.desc()).all()
+    return [TributeImage(
+        id=img.id,
+        image_data=img.image_data,
+        caption=img.caption,
+        timestamp=img.timestamp
+    ) for img in images]
 
 
 @api_router.post("/tribute", response_model=TributeImage)
-async def create_tribute_image(image: TributeImageCreate):
-    tribute_obj = TributeImage(**image.model_dump())
-    doc = tribute_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    await db.tribute.insert_one(doc)
-    return tribute_obj
+def create_tribute_image(image: TributeImageCreate, db: Session = Depends(get_db)):
+    db_image = TributeImageDB(
+        id=str(uuid.uuid4()),
+        image_data=image.image_data,
+        caption=image.caption,
+        timestamp=datetime.now(timezone.utc)
+    )
+    db.add(db_image)
+    db.commit()
+    db.refresh(db_image)
+    return TributeImage(
+        id=db_image.id,
+        image_data=db_image.image_data,
+        caption=db_image.caption,
+        timestamp=db_image.timestamp
+    )
 
 
 @api_router.delete("/tribute/{image_id}")
-async def delete_tribute_image(image_id: str):
-    result = await db.tribute.delete_one({"id": image_id})
-    if result.deleted_count == 0:
+def delete_tribute_image(image_id: str, db: Session = Depends(get_db)):
+    image = db.query(TributeImageDB).filter(TributeImageDB.id == image_id).first()
+    if not image:
         raise HTTPException(status_code=404, detail="Image not found")
+    db.delete(image)
+    db.commit()
     return {"success": True}
 
 
 @api_router.get("/settings/theme")
-async def get_theme():
-    settings = await db.settings.find_one({"key": "theme"}, {"_id": 0})
-    return {"theme": settings.get("value", "dark") if settings else "dark"}
+def get_theme(db: Session = Depends(get_db)):
+    settings = db.query(SettingsDB).filter(SettingsDB.key == "theme").first()
+    return {"theme": settings.value if settings else "dark"}
 
 
 @api_router.put("/settings/theme")
-async def update_theme(theme_update: ThemeUpdate):
-    await db.settings.update_one(
-        {"key": "theme"},
-        {"$set": {"value": theme_update.theme}},
-        upsert=True
-    )
+def update_theme(theme_update: ThemeUpdate, db: Session = Depends(get_db)):
+    settings = db.query(SettingsDB).filter(SettingsDB.key == "theme").first()
+    if settings:
+        settings.value = theme_update.theme
+    else:
+        settings = SettingsDB(key="theme", value=theme_update.theme)
+        db.add(settings)
+    db.commit()
     return {"theme": theme_update.theme}
 
 
@@ -270,7 +390,3 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
