@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1"/>
+        <meta name="theme-color" content="#000000"/>
+        <meta name="description" content="Barricade"/>
+        <title>Evamp</title>
+        <script>
+        !function()
+        {function e(e,r,o="info")
+        {window.parent.postMessage(
+            {source:"preview-logger",type:e,category:t(e),severity:o,data:r,timestamp:(new Date)
+            .toISOString()},"*")
+        }function t(e)
+        {return{buildError:"build",
+        runtimeError:"runtime",
+        promiseRejection:"runtime",
+        resourceError:"resource",
+        networkError:"network",
+        console:"console"}[e]||"other"
+    }const r={log:console.log,error:
+        console.error,warn:
+        console.warn,info:
+        console.info,debug:
+        console.debug};
+        function o()
+        {let t=null;
+            const r=document.querySelector("vite-error-overlay");
+            if(r&&r.shadowRoot)
+            {const e=r.shadowRoot,o=e.querySelector(".message-body")
+            ||e.querySelector(".message")
+            ||e.querySelector("pre"),n=e.querySelector(".stack")
+            ||e.querySelector(".file"),s=e.querySelector(".file");
+            o&&(t={message:o.textContent.trim(),stack:n?n.textContent.trim():"",
+            file:s?s.textContent.trim():"",
+            tool:"Vite",rawHTML:e.innerHTML.substring(0,5e3)
+        })
+    }if
+    (!t)
+    {const e=document.querySelector('iframe[id*="webpack"]')
+    ||document.querySelector("[data-reactroot]");
+    if(e)try{let r="";if("IFRAME"===e.tagName)
+    {const t=e.contentDocument
+        ||e.contentWindow?.document;t&&(r=t.body.textContent)
+    }else r=e.textContent;
+    r&&(t={message:r.substring(0,1e3),
+        tool:"Webpack",rawText:r.substring(0,5e3)
+    })
+}catch(e)
+{t={message:"Webpack build error detected (unable to extract details due to iframe restrictions)",
+tool:"Webpack",error:e.message}
+}}if(!t){const e=document.body?.textContent
+    ||"",r=document.body?.innerHTML
+    ||"",o=["Failed to compile",
+    "Compilation failed",
+    "Build failed",
+    "Module not found",
+    "Cannot find module",
+    "Syntax error",
+    "Module parse failed",
+    "You may need an appropriate loader",
+    "ERROR in",
+    "Module build failed"];
+    if(o.some(t=>e.includes(t)
+    ||r.includes(t)))
+{const r=document.querySelector("pre"),
+n=document.querySelector('[class*="error"]')
+||document.querySelector('[id*="error"]');let s="";
+if(r)s=r.textContent;else if(n)s=n.textContent;
+else{const t=e.split("\n"),
+r=t.findIndex(e=>o.some(t=>e.includes(t)));-1!==r&&(s=t.slice(Math.max(0,r-2),Math.min(t.length,r+15)).join("\n"))}t={message:s.trim().substring(0,2e3),
+    tool:"Build Tool",fullBody:e.substring(0,3e3)}
+}}const o=document.querySelector('[data-test-id="error-boundary"]')
+||document.querySelector(".react-error-overlay");
+return!t&&o&&(t={message:o.textContent.trim(),
+    tool:"React",stack:o.querySelector(".stack-trace")?.textContent
+    ||""}),
+    !!t&&(e("buildError",t,"critical"),
+    !0)}["log","error","warn","info","debug"].
+    forEach
+    (t=>{console[t]=function(...o){r[t].
+        apply(console,o);
+        const n="error"===t?"error":
+        "warn"===t?"warning":
+        "info";
+        e("console",{
+            level:t,message:
+            o.map(e=>{try{return"object"
+            ==typeof e?JSON.
+            stringify(e,null,2):
+            String(e)}catch(t)
+            {return String(e)}})},n)}}),
+            window.addEventListener
+            ("error",t=>{t.target===window&&e
+                ("runtimeError",{
+                    message:t.message,filename:t.filename,lineno:t.lineno,colno:t.colno,stack:t.error?.stack
+                    ||"",errorType:t.error?.name||"Error",errorObject:t.error?
+                    {name:t.error.name,message:t.error.message,stack:t.error.stack}:null},"error")}),
+                    window.addEventListener
+                    ("unhandledrejection",t=>
+                    {let r=t.reason,o={};if(r instanceof Error)o={name:r.name,message:r.message,stack:r.stack};
+                    else if("object"==typeof r)
+                    try{o=JSON.parse(JSON.stringify(r))}
+                catch(e){o={toString:String(r)}}
+                else o={value:String(r)};
+                e("promiseRejection",
+                {reason:String(r),
+                    reasonDetails:o,stack:r?.stack
+                    ||"",promise:String(t.promise)},"error")}),
+                    window.addEventListener
+                    ("error",t=>{if(t.target!==window)
+                        {const r=t.target.tagName,o="SCRIPT"===r
+                        ||"LINK"===r?"error":
+                        "warning";
+                        e("resourceError",
+                        {tagName:r,src:t.target.src||t.target.href,type:"Resource failed to load",outerHTML:t.target.outerHTML},o)}},
+                        !0);
+                        const n=window.fetch;
+                        window.fetch=function(...t)
+                        {const r=t[0],o=Date.now();
+                            return n.apply(this,t).
+                            then(t=>t.ok?t:t.text().
+                            then(n=>(e("networkError",
+                            {url:r,status:
+                                t.status,statusText:
+                                t.statusText,responseBody:
+                                n.substring(0,1e3),headers:
+                                Object.fromEntries(t.headers.entries()),
+                                duration:Date.now()-o,type:"API Error"},
+                                "error"),t)).
+                                catch(()=>t)).
+                                catch(t=>{throw e("networkError",
+                                {url:r,message:
+                                    t.message,stack:
+                                    t.stack,type:"Network Error",duration:Date.now()-o},"error"),t})
+                                };const 
+                                s=XMLHttpRequest.prototype.open,
+                                i=XMLHttpRequest.prototype.send;
+                                XMLHttpRequest.prototype.
+                                open=function(e,t)
+                                {return this._url=t,this._method=e,s.apply(this,arguments)},
+                                XMLHttpRequest.prototype.send=function()
+                                {return 
+                                this.addEventListener
+                                ("error",function()
+                                {e("networkError",
+                                {url:this._url,method:
+                                    this._method,type:
+                                    "XHR Error",message:
+                                    "Request failed"},
+                                    "error")}),
+                                    this.addEventListener
+                                    ("load",function()
+                                    {this.status>=400&&e
+                                        ("networkError",
+                                        {url:this._url,
+                                            method:this._method,
+                                            status:this.status,
+                                            statusText:this.statusText,
+                                            responseText:this.responseText?.
+                                            substring(0,1e3),
+                                            type:"XHR Error"},"error")}),
+                                            i.apply(this,arguments)},
+                                            window.addEventListener
+                                            ("load",
+                                            ()=>
+                                            {setTimeout(()=>{o()
+                                            ||e("ready",
+                                            {url:window.location.href,userAgent:
+                                                navigator.userAgent,viewport:
+                                                {width:
+                                                    window.innerWidth,height:window.innerHeight}},
+                                                "info")},100)});
+                                                let a="";setInterval(()=>
+                                            {const e=document.body?.textContent
+                                            ||"";e!==a&&(o(),a=e)},2e3),
+                                            setTimeout(o,100)}()
+                                            </script>
+                                            <script>if(window.self!==window.top){var debugMonitorScript=document.createElement("script");debugMonitorScript.src="https://assets.emergent.sh/scripts/debug-monitor.js",document.head.appendChild(debugMonitorScript),window.tailwind=window.tailwind||{},tailwind.config={corePlugins:{preflight:!1}};var tailwindScript=document.createElement("script");tailwindScript.src="https://cdn.tailwindcss.com",document.head.appendChild(tailwindScript)}</script><script defer="defer" src="/static/js/main.63de9681.js"></script><link href="/static/css/main.85c53c64.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script>!function(e,t){var r,s,o,i;t.__SV||(window.posthog=t,t._i=[],t.init=function(n,a,p){function c(e,t){var r=t.split(".");2==r.length&&(e=e[r[0]],t=r[1]),e[t]=function(){e.push([t].concat(Array.prototype.slice.call(arguments,0)))}}(o=e.createElement("script")).type="text/javascript",o.crossOrigin="anonymous",o.async=!0,o.src=a.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(i=e.getElementsByTagName("script")[0]).parentNode.insertBefore(o,i);var g=t;for(void 0!==p?g=t[p]=[]:p="posthog",g.people=g.people||[],g.toString=function(e){var t="posthog";return"posthog"!==p&&(t+="."+p),e||(t+=" (stub)"),t},g.people.toString=function(){return g.toString(1)+".people (stub)"},r="init me ws ys ps bs capture je Di ks register register_once register_for_session unregister unregister_for_session Ps getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Es $s createPersonProfile Is opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing Ss debug xs getPageViewId captureTraceFeedback captureTraceMetric".split(" "),s=0;s<r.length;s++)c(g,r[s]);t._i.push([n,a,p])},t.__SV=1)}(document,window.posthog||[]),posthog.init("phc_yJW1VjHGGwmCbbrtczfqqNxgBDbhlhOWcdzcIJEOTFE",{api_host:"https://us.i.posthog.com",person_profiles:"identified_only"})</script></body></html>
