@@ -29,16 +29,33 @@ async function connectToDatabase() {
   if (cachedDb) return cachedDb;
 
   if (!mongoUrl || !dbName) {
-    throw new Error("Missing MongoDB configuration. Please set MONGO_URL and DB_NAME in .env");
+    const missing = [];
+    if (!mongoUrl) missing.push("MONGO_URL");
+    if (!dbName) missing.push("DB_NAME");
+    throw new Error(`Missing MongoDB configuration: ${missing.join(", ")}. Check Vercel Environment Variables.`);
   }
 
-  const client = new MongoClient(mongoUrl);
-  await client.connect();
-  const db = client.db(dbName);
+  // Diagnostic: Warn if connecting to localhost in production
+  if (process.env.NODE_ENV === "production" && mongoUrl.includes("localhost")) {
+    console.warn("CRITICAL: MONGO_URL points to localhost in production environment!");
+  }
 
-  cachedClient = client;
-  cachedDb = db;
-  return db;
+  try {
+    const client = new MongoClient(mongoUrl, {
+      connectTimeoutMS: 5000, // Fail fast if connection is slow
+      serverSelectionTimeoutMS: 5000
+    });
+    await client.connect();
+    const db = client.db(dbName);
+
+    cachedClient = client;
+    cachedDb = db;
+    console.log(`Successfully connected to database: ${dbName}`);
+    return db;
+  } catch (err) {
+    console.error("MongoDB Connection Error:", err.message);
+    throw err;
+  }
 }
 
 // Middleware
@@ -85,11 +102,18 @@ const requireAuth = (req, res, next) => {
 
 // Database injection middleware for every request
 app.use(async (req, res, next) => {
+  // Skip DB for static files or if already handled (though rewriting handles this)
+  if (req.path.startsWith("/_next") || req.path.includes(".")) return next();
+
   try {
     req.db = await connectToDatabase();
     next();
   } catch (err) {
-    res.status(500).json({ detail: "Database connection failed" });
+    console.error(`[DB Error] ${req.method} ${req.url}:`, err.message);
+    res.status(500).json({ 
+      detail: "Database connection failed",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined 
+    });
   }
 });
 
