@@ -1,0 +1,19 @@
+{
+  "watch": [
+    "app.js",
+    "models/",
+    ".env"
+  ],
+  "ext": "js,json",
+  "ignore": [
+    "src/",
+    "public/",
+    "dist/",
+    "node_modules/",
+    "*.config.js",
+    "tailwind.config.js",
+    "postcss.config.js",
+    "vite.config.js"
+  ],
+  "delay": 500
+}
