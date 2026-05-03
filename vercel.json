@@ -17,6 +17,10 @@
       "destination": "/app.js"
     },
     {
+      "source": "/((?!api/|.*\\.).*)",
+      "destination": "/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/dist/$1"
     }
