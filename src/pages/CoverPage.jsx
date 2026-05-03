@@ -37,28 +37,9 @@ const StatWidget = React.memo(({ icon: Icon, title, value, detail, color, delay,
 
 const CoverPage = () => {
   const { theme } = useTheme();
-  const [timeTogether, setTimeTogether] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [stats, setStats] = useState({ memories: 0, journals: 0, achievements: 0, completedTodos: 0 });
 
   useEffect(() => {
-    // Reading from September 11th, 2025 as updated by the user
-    const startDate = new Date('2025-09-11T00:00:00');
-    
-    const updateTimer = () => {
-      const now = new Date();
-      const difference = now - startDate;
-      
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      const seconds = Math.floor((difference / 1000) % 60);
-      
-      setTimeTogether({ days, hours, minutes, seconds });
-    };
-
-    const timer = setInterval(updateTimer, 1000);
-    updateTimer();
-
     const fetchStats = async () => {
       try {
         const response = await api.get('/stats');
@@ -68,8 +49,6 @@ const CoverPage = () => {
       }
     };
     fetchStats();
-
-    return () => clearInterval(timer);
   }, []);
 
   return (
@@ -109,20 +88,24 @@ const CoverPage = () => {
 
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 px-4">
-           {/* Timer Card - Realistic Scale */}
+           {/* Journey Card - Replaces Timer */}
            <motion.div 
              initial={{ opacity: 0, y: 10 }}
              animate={{ opacity: 1, y: 0 }}
-             className="md:col-span-2 lg:col-span-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-8 md:p-10 rounded-[2.5rem] shadow-sm relative overflow-hidden"
+             className="md:col-span-2 lg:col-span-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-8 md:p-12 rounded-[2.5rem] shadow-sm relative overflow-hidden group"
            >
-              <div className="flex items-center justify-between mb-12">
+              <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:opacity-20 transition-opacity">
+                 <Heart size={120} fill="currentColor" className="text-red-500" />
+              </div>
+
+              <div className="flex items-center justify-between mb-16">
                  <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-indigo-500 text-white shadow-lg shadow-indigo-600/20">
-                       <Clock size={20} />
+                    <div className="p-3 rounded-xl bg-red-500 text-white shadow-lg shadow-red-600/20">
+                       <Sparkles size={20} />
                     </div>
                     <div>
-                       <h2 className="text-xl font-bold heading-font tracking-tight uppercase">UPTIME MONITOR</h2>
-                       <p className="text-[9px] font-black tracking-[0.2em] text-slate-400 uppercase">Continuous Synchronization</p>
+                       <h2 className="text-xl font-bold heading-font tracking-tight uppercase">CHRONICLES OF US</h2>
+                       <p className="text-[9px] font-black tracking-[0.2em] text-slate-400 uppercase">Cherishing every chapter of our story</p>
                     </div>
                  </div>
                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
@@ -131,34 +114,23 @@ const CoverPage = () => {
                  </div>
               </div>
               
-              <div className="flex flex-wrap items-end gap-x-10 gap-y-8">
-                {[
-                  { label: 'Days', value: timeTogether.days },
-                  { label: 'Hours', value: timeTogether.hours },
-                  { label: 'Minutes', value: timeTogether.minutes },
-                  { label: 'Seconds', value: timeTogether.seconds }
-                ].map((unit, i) => (
-                  <div key={i} className="flex flex-col min-w-fit">
-                    <div className="text-5xl md:text-6xl font-bold mono-font leading-none text-indigo-500 tabular-nums tracking-tighter">
-                      {unit.value.toString().padStart(2, '0')}
-                    </div>
-                    <div className="flex items-center gap-2 mt-3">
-                       <div className="w-4 h-[1.5px] bg-indigo-500/20" />
-                       <div className="text-[9px] font-black tracking-[0.3em] uppercase text-slate-400">
-                         {unit.label}
-                       </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="py-8">
+                 <h3 className="text-4xl md:text-6xl font-bold heading-font tracking-tighter text-indigo-500 leading-none mb-6">
+                    ETERNALLY <br />
+                    SYNCHRONIZED
+                 </h3>
+                 <p className={`text-sm body-font max-w-md ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
+                    An unbreakable bond forged in time, documented in memories, and secured forever.
+                 </p>
               </div>
 
-              <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="mt-16 pt-8 border-t border-slate-100 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
                  <div className="flex items-center gap-3">
                     <div className="flex -space-x-2">
                        <div className="w-8 h-8 rounded-full bg-indigo-600 border-2 border-white dark:border-slate-800 flex items-center justify-center text-white font-black text-[10px]">B</div>
                        <div className="w-8 h-8 rounded-full bg-red-500 border-2 border-white dark:border-slate-800 flex items-center justify-center text-white font-black text-[10px]">E</div>
                     </div>
-                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-500">Protocol Alpha Active</p>
+                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-500">Love Protocol Active</p>
                  </div>
                  <div className="text-[8px] font-black tracking-[0.4em] text-slate-300 uppercase">
                     MSR_ARCHIVE_SECURED
